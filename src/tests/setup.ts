@@ -1,7 +1,8 @@
 import { beforeEach, afterEach, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
-// Import mocks in the correct order
+// Import mocks in the correct order - auth must come first as it's used by safe-action
+import './mocks/auth';
 import './mocks/next';
 import './mocks/next-safe-action';
 import './mocks/prisma';

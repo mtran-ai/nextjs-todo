@@ -24,6 +24,7 @@ export const mockPrismaClient = {
     create: vi.fn(),
     findUnique: vi.fn(),
     delete: vi.fn(),
+    upsert: vi.fn(),
   },
 } as unknown as PrismaClient;
 
