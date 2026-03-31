@@ -12,7 +12,10 @@
     "studio": "dotenvx run --env-file=.env.local -- prisma studio",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.59.1",
@@ -45,6 +48,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@types/bcrypt": "^5.0.2",
@@ -61,6 +65,7 @@
     "prettier-plugin-tailwindcss": "^0.5.11",
     "prisma": "^5.12.1",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "vitest": "^1.0.4"
   }
