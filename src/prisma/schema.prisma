@@ -1,0 +1,67 @@
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id       String @id @default(cuid())
+    username String @unique
+    password String
+
+    tasks    Task[]
+    comments Comment[]
+
+    @@map("users")
+}
+
+model Task {
+    id          String    @id @default(cuid())
+    done        Boolean   @default(false)
+    title       String
+    description String?   @db.Text
+    due         DateTime?
+    createdAt   DateTime  @default(now())
+    authorId    String
+
+    author   User      @relation(fields: [authorId], references: [id])
+    comments Comment[]
+
+    gh Repo?
+
+    @@index([authorId])
+    @@map("tasks")
+}
+
+model Repo {
+    id       Int    @id @default(autoincrement())
+    owner    String
+    repoName String @map("repo_name")
+    fullName String @map("full_name")
+
+    taskId String @unique
+
+    task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@map("gh_links")
+}
+
+model Comment {
+    id        String   @id @default(cuid())
+    text      String
+    createdAt DateTime @default(now())
+
+    senderId String
+    sender   User   @relation(fields: [senderId], references: [id])
+
+    taskId String
+    task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@index([taskId])
+    @@index([senderId])
+    @@map("comments")
+}
