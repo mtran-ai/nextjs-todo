@@ -15,8 +15,9 @@ export const test = base.extend<AuthFixtures>({
   authenticatedPage: async ({ page, testUser }, use) => {
     // Sign up the test user
     await page.goto('/sign-up');
-    await page.fill('input[type="text"]', testUser.username);
-    await page.fill('input[type="password"]', testUser.password);
+    await page.fill('input#username', testUser.username);
+    await page.fill('input#password', testUser.password);
+    await page.fill('input#confirm-password', testUser.password);
     await page.click('button[type="submit"]');
 
     // Wait for redirect to home page
