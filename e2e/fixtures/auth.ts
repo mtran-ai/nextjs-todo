@@ -7,9 +7,11 @@ type AuthFixtures = {
 };
 
 export const test = base.extend<AuthFixtures>({
-  testUser: {
-    username: `testuser_${Date.now()}`,
-    password: 'TestPassword123'
+  testUser: async ({}, use) => {
+    await use({
+      username: `testuser_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      password: 'TestPassword123'
+    });
   },
 
   authenticatedPage: async ({ page, testUser }, use) => {
@@ -17,7 +19,7 @@ export const test = base.extend<AuthFixtures>({
     await page.goto('/sign-up');
 
     // Wait for form to be visible
-    await page.waitForSelector('input#username', { timeout: 15000 });
+    await page.waitForSelector('input#username', { timeout: 1000 });
 
     await page.fill('input#username', testUser.username);
     await page.fill('input#password', testUser.password);
