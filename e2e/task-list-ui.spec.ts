@@ -109,10 +109,11 @@ test.describe('Task list UI improvements', () => {
       timeout: 10000
     });
 
-    // Click the done toggle button for this task
+    // Click the done checkbox SVG (DoneCheckbox renders an svg, not a button)
     const taskItem = page.locator('li').filter({ hasText: 'Task to complete' });
-    await taskItem.locator('button').first().click();
-    await page.waitForTimeout(1000);
+    await taskItem.locator('svg').first().click();
+    // Wait for server action + revalidation to re-render the list item
+    await page.waitForTimeout(2000);
 
     await expect(taskItem).toHaveClass(/opacity-60/);
     const title = taskItem.locator('h4');
