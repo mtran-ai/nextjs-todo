@@ -1,9 +1,14 @@
-import { PrismaClient } from '@prisma/client';
+// Import with absolute path to support Playwright global setup
+// Using dynamic import for ES module compatibility
+const prismaPromise = import('@prisma/client').then(
+  m => m.PrismaClient
+);
 
-let prisma: PrismaClient;
+let prisma: any;
 
 export async function getPrismaClient() {
   if (!prisma) {
+    const PrismaClient = await prismaPromise;
     prisma = new PrismaClient({
       datasources: {
         db: {

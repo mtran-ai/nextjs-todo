@@ -130,6 +130,19 @@ NEXTAUTH_URL=<app-url>
 
 See `src/.env.example` for all required variables.
 
+## Git Workflow
+
+This project uses **Gitflow**. Branch naming conventions:
+
+- `features/<name>` — new features
+- `bugfixes/<name>` — bug fixes
+- `hotfixes/<name>` — urgent production fixes
+- `releases/<version>` — release preparation
+- `main` — production-ready code
+- `develop` — integration branch for features
+
+Always branch off `develop` for features and bugfixes. Hotfixes branch off `main`.
+
 ## Code Style
 
 - **ESLint**: Uses Next.js recommended config (`eslint-config-next`)
