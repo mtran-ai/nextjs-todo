@@ -1,18 +1,15 @@
 import { type Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { Separator } from '~/components/ui/separator';
 
 import { db } from '~/lib/db';
-import { formatDate } from '~/lib/utils';
 import { auth } from '~/lib/auth';
 import { PAGES } from '~/lib/constants';
 
-import { DoneCheckbox } from '~/components/done-checkbox';
-import { TaskMenu } from '~/components/task-menu';
 import { Search } from '~/components/search';
 import { Icons } from '~/components/icons';
 import { CreateTaskForm } from '~/components/task-form';
+import { TaskCard } from '~/components/task-card';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
@@ -41,9 +38,7 @@ async function getMyTasks(searchValue: string = '') {
         }
       ]
     },
-    orderBy: {
-      createdAt: 'desc'
-    },
+    orderBy: [{ done: 'asc' }, { createdAt: 'desc' }],
     include: {
       gh: {
         select: {
@@ -76,6 +71,8 @@ export default async function HomePage({
   const { q } = await searchParams;
   const tasks = await getMyTasks(q ?? '');
 
+  const doneCount = tasks.filter((t) => t.done).length;
+
   return (
     <div className='flex w-full max-w-[650px] flex-col gap-6'>
       <div className='flex items-center justify-between gap-3'>
@@ -84,57 +81,29 @@ export default async function HomePage({
       </div>
       <Separator />
       {tasks.length === 0 ? (
-        <span className='text-center text-sm'>you have no tasks yet 🥲</span>
+        <div
+          data-testid='empty-state'
+          className='flex flex-col items-center gap-3 py-12 text-muted-foreground'
+        >
+          <Icons.square className='size-10 opacity-30' />
+          <p className='text-sm font-medium'>No tasks yet</p>
+          <p className='text-xs'>Create your first task to get started.</p>
+        </div>
       ) : (
-        <ul className='flex flex-col gap-3 text-sm'>
-          {tasks.map((task) => (
-            <li
-              key={task.id}
-              className='flex items-center gap-2 rounded-md border p-3'
-            >
-              <DoneCheckbox id={task.id} done={task.done} />
-              <Link
-                className='flex-1 overflow-hidden rounded-md p-2 hover:bg-accent'
-                href={`/${username}/${task.id}`}
-              >
-                <div className='flex flex-1 flex-col gap-1'>
-                  <h4 className='font-semibold'>{task.title}</h4>
-                  <span className='max-h-[20px] overflow-hidden text-ellipsis'>
-                    {task.description || 'no description'}
-                  </span>
-                  {!!task.due ? (
-                    <time className='flex items-center gap-1'>
-                      <Icons.calendarClock className='size-4 flex-shrink-0' />
-                      <span className='sm:hidden'>{`${formatDate(task.due.toString(), 'short')}`}</span>
-                      <span className='hidden sm:block'>{`${formatDate(task.due.toString())}`}</span>
-                    </time>
-                  ) : (
-                    <span>no due date</span>
-                  )}
-                  {task.gh ? (
-                    <span className='flex items-center gap-1'>
-                      <Icons.github className='size-4 flex-shrink-0' />
-                      <span className='overflow-hidden text-ellipsis text-nowrap'>
-                        {task.gh.fullName}
-                      </span>
-                    </span>
-                  ) : (
-                    <span>no linked repo</span>
-                  )}
-                  {task._count.comments > 0 ? (
-                    <span className='flex items-center gap-1'>
-                      <Icons.comments className='size-4' />
-                      <span>{task._count.comments}</span>
-                    </span>
-                  ) : (
-                    <span>no comments</span>
-                  )}
-                </div>
-              </Link>
-              <TaskMenu {...task} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <p
+            data-testid='task-progress'
+            className='text-xs text-muted-foreground'
+          >
+            {doneCount} of {tasks.length} task{tasks.length !== 1 ? 's' : ''}{' '}
+            complete
+          </p>
+          <ul className='flex flex-col gap-3 text-sm'>
+            {tasks.map((task) => (
+              <TaskCard key={task.id} task={task} username={username} />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
