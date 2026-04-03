@@ -4,8 +4,7 @@ export default {
   prefix: '',
   darkMode: ['class'],
   content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}'
+    './src/**/*.{ts,tsx,css}',
   ],
   theme: {
     container: {

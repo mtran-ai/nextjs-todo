@@ -3,13 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "prisma:gen": "npx prisma generate",
-    "db:push": "dotenvx run --env-file=.env.local -- prisma db push",
-    "studio": "dotenvx run --env-file=.env.local -- prisma studio"
+    "dev": "next dev src",
+    "build": "next build src",
+    "start": "next start src",
+    "lint": "next lint src",
+    "prisma:gen": "npx prisma generate --schema=src/prisma/schema.prisma",
+    "db:push": "dotenvx run --env-file=.env.local -- prisma db push --schema=src/prisma/schema.prisma",
+    "studio": "dotenvx run --env-file=.env.local -- prisma studio --schema=src/prisma/schema.prisma",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:ui": "playwright test --config=playwright.config.ts --ui",
+    "test:e2e:debug": "playwright test --config=playwright.config.ts --debug",
+    "test:e2e:setup": "dotenvx run --env-file=.env.test -- prisma db push --schema=src/prisma/schema.prisma"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.59.1",
@@ -42,18 +49,25 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
+    "@vitest/ui": "^1.0.4",
     "autoprefixer": "^10.4.17",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.1",
+    "happy-dom": "^12.10.3",
     "postcss": "^8.4.35",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "prisma": "^5.12.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
   }
 }
