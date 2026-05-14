@@ -1,8 +1,7 @@
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 
 import { PAGES } from '~/lib/constants';
 
-// Edge-compatible config: no bcrypt, no db imports
 export const authConfig = {
   pages: {
     signIn: PAGES.SIGN_IN
@@ -24,4 +23,4 @@ export const authConfig = {
       return token;
     }
   }
-} satisfies NextAuthConfig;
+} satisfies NextAuthOptions;

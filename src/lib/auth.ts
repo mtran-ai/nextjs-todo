@@ -1,11 +1,12 @@
-import NextAuth from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { getServerSession } from 'next-auth/next';
 import * as bcrypt from 'bcrypt';
 
 import { db } from '~/lib/db';
 import { authConfig } from '~/lib/auth.config';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
   ...authConfig,
   session: {
     strategy: 'jwt',
@@ -16,8 +17,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       name: 'Credentials provider',
       credentials: {
-        username: { label: 'username', type: 'text', required: true },
-        password: { label: 'password', type: 'password', required: true }
+        username: { label: 'username', type: 'text' },
+        password: { label: 'password', type: 'password' }
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
@@ -46,4 +47,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     })
   ]
-});
+};
+
+export const auth = () => getServerSession(authOptions);

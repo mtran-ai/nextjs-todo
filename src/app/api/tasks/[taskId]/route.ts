@@ -11,7 +11,8 @@ const paramsSchema = z.object({
 const updateTaskSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  due: z.string().nullish()
+  due: z.string().nullish(),
+  labelIds: z.array(z.string()).optional()
 });
 
 export async function PATCH(
@@ -33,11 +34,31 @@ export async function PATCH(
     const json = await request.json();
     const body = updateTaskSchema.parse(json);
 
+    const labelIds = body.labelIds;
+
+    if (labelIds && labelIds.length > 0) {
+      const ownedCount = await db.label.count({
+        where: { id: { in: labelIds }, userId: session.user.id }
+      });
+
+      if (ownedCount !== labelIds.length) {
+        return Response.json({
+          success: false,
+          message: 'One or more labels do not exist'
+        });
+      }
+    }
+
     await db.task.update({
       data: {
         title: body.title,
         description: body.description,
-        due: body.due
+        due: body.due,
+        ...(labelIds !== undefined && {
+          labels: {
+            set: labelIds.map((id) => ({ id }))
+          }
+        })
       },
       where: {
         id: params.taskId

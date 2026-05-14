@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { DoneCheckbox } from '~/components/done-checkbox';
 import { TaskMenu } from '~/components/task-menu';
 import { Icons } from '~/components/icons';
+import { Badge } from '~/components/ui/badge';
 import { formatDate, cn } from '~/lib/utils';
 
 type TaskCardProps = {
@@ -13,6 +14,7 @@ type TaskCardProps = {
     due: Date | null;
     gh: { fullName: string } | null;
     _count: { comments: number };
+    labels: { id: string; name: string; color: string }[];
   };
   username: string;
 };
@@ -24,6 +26,7 @@ function isOverdue(due: Date | null, done: boolean): boolean {
 export function TaskCard({ task, username }: TaskCardProps) {
   const overdue = isOverdue(task.due, task.done);
   const hasMetadata = task.due || task.gh || task._count.comments > 0;
+  const hasLabels = task.labels.length > 0;
 
   return (
     <li
@@ -50,6 +53,22 @@ export function TaskCard({ task, username }: TaskCardProps) {
             <span className='line-clamp-2 text-sm text-muted-foreground'>
               {task.description}
             </span>
+          )}
+          {hasLabels && (
+            <div
+              data-testid='task-labels'
+              className='mt-1 flex flex-wrap gap-1'
+            >
+              {task.labels.map((label) => (
+                <Badge
+                  key={label.id}
+                  style={{ backgroundColor: label.color, color: '#fff' }}
+                  className='border-transparent'
+                >
+                  {label.name}
+                </Badge>
+              ))}
+            </div>
           )}
           {hasMetadata && (
             <div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
@@ -88,7 +107,13 @@ export function TaskCard({ task, username }: TaskCardProps) {
           )}
         </div>
       </Link>
-      <TaskMenu {...task} />
+      <TaskMenu
+        id={task.id}
+        title={task.title}
+        description={task.description}
+        due={task.due}
+        labels={task.labels}
+      />
     </li>
   );
 }

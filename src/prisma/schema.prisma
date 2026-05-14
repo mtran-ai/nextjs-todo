@@ -15,6 +15,7 @@ model User {
 
     tasks    Task[]
     comments Comment[]
+    labels   Label[]
 
     @@map("users")
 }
@@ -30,11 +31,27 @@ model Task {
 
     author   User      @relation(fields: [authorId], references: [id])
     comments Comment[]
+    labels   Label[]
 
     gh Repo?
 
     @@index([authorId])
     @@map("tasks")
+}
+
+model Label {
+    id        String   @id @default(cuid())
+    name      String
+    color     String
+    createdAt DateTime @default(now())
+    userId    String
+
+    user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    tasks Task[]
+
+    @@unique([userId, name])
+    @@index([userId])
+    @@map("labels")
 }
 
 model Repo {

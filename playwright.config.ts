@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 import { existsSync } from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 
 const globalSetupPath = path.resolve(__dirname, './e2e/global.setup.ts');
 

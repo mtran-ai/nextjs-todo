@@ -14,7 +14,10 @@ import {
   SendHorizontal,
   ChevronDown,
   Github,
-  Link
+  Link,
+  Tag,
+  Check,
+  X
 } from 'lucide-react';
 
 export const Icons = {
@@ -33,5 +36,8 @@ export const Icons = {
   send: SendHorizontal,
   arrowDown: ChevronDown,
   github: Github,
-  link: Link
+  link: Link,
+  tag: Tag,
+  check: Check,
+  close: X
 };

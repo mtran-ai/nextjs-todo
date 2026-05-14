@@ -7,7 +7,8 @@ import { db } from '~/lib/db';
 const createTaskSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  due: z.string().nullish()
+  due: z.string().nullish(),
+  labelIds: z.array(z.string()).optional()
 });
 
 export async function POST(request: NextRequest) {
@@ -24,12 +25,30 @@ export async function POST(request: NextRequest) {
     const json = await request.json();
     const body = createTaskSchema.parse(json);
 
+    const labelIds = body.labelIds ?? [];
+
+    if (labelIds.length > 0) {
+      const ownedCount = await db.label.count({
+        where: { id: { in: labelIds }, userId: session.user.id }
+      });
+
+      if (ownedCount !== labelIds.length) {
+        return Response.json({
+          success: false,
+          message: 'One or more labels do not exist'
+        });
+      }
+    }
+
     await db.task.create({
       data: {
         title: body.title,
         description: body.description,
         due: body.due,
-        authorId: session.user.id
+        authorId: session.user.id,
+        labels: {
+          connect: labelIds.map((id) => ({ id }))
+        }
       }
     });
 

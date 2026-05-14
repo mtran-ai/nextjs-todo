@@ -10,12 +10,17 @@ import { Search } from '~/components/search';
 import { Icons } from '~/components/icons';
 import { CreateTaskForm } from '~/components/task-form';
 import { TaskCard } from '~/components/task-card';
+import { TodoStats } from '~/components/todo-stats';
+import { LabelFilter } from '~/components/label-filter';
 
 export const metadata: Metadata = {
   title: 'Home page 🏡'
 };
 
-async function getMyTasks(searchValue: string = '') {
+async function getMyTasks(
+  searchValue: string = '',
+  labelIds: string[] = []
+) {
   const session = await auth();
 
   if (!session) {
@@ -36,7 +41,12 @@ async function getMyTasks(searchValue: string = '') {
             contains: searchValue
           }
         }
-      ]
+      ],
+      ...(labelIds.length > 0 && {
+        labels: {
+          some: { id: { in: labelIds } }
+        }
+      })
     },
     orderBy: [{ done: 'asc' }, { createdAt: 'desc' }],
     include: {
@@ -44,6 +54,10 @@ async function getMyTasks(searchValue: string = '') {
         select: {
           fullName: true
         }
+      },
+      labels: {
+        select: { id: true, name: true, color: true },
+        orderBy: { name: 'asc' }
       },
       _count: {
         select: {
@@ -65,11 +79,13 @@ export default async function HomePage({
   }>;
   searchParams: Promise<{
     q?: string;
+    labels?: string;
   }>;
 }) {
   const { username } = await params;
-  const { q } = await searchParams;
-  const tasks = await getMyTasks(q ?? '');
+  const { q, labels } = await searchParams;
+  const labelIds = labels ? labels.split(',').filter(Boolean) : [];
+  const tasks = await getMyTasks(q ?? '', labelIds);
 
   const doneCount = tasks.filter((t) => t.done).length;
 
@@ -77,6 +93,7 @@ export default async function HomePage({
     <div className='flex w-full max-w-[650px] flex-col gap-6'>
       <div className='flex items-center justify-between gap-3'>
         <Search />
+        <LabelFilter />
         <CreateTaskForm />
       </div>
       <Separator />
@@ -91,13 +108,7 @@ export default async function HomePage({
         </div>
       ) : (
         <>
-          <p
-            data-testid='task-progress'
-            className='text-xs text-muted-foreground'
-          >
-            {doneCount} of {tasks.length} task{tasks.length !== 1 ? 's' : ''}{' '}
-            complete
-          </p>
+          <TodoStats total={tasks.length} completed={doneCount} />
           <ul className='flex flex-col gap-3 text-sm'>
             {tasks.map((task) => (
               <TaskCard key={task.id} task={task} username={username} />
