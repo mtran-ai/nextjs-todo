@@ -26,6 +26,7 @@ import {
 } from '~/components/ui/dialog';
 
 import { Icons } from '~/components/icons';
+import { LabelSelector } from '~/components/label-selector';
 
 import { formatDate } from '~/lib/utils';
 
@@ -35,7 +36,8 @@ const createTaskSchema = z.object({
     .min(1, { message: 'Title is required' })
     .max(30, { message: 'The title is too long (max: 30 symbols)' }),
   description: z.string().nullish(),
-  due: z.date().nullish()
+  due: z.date().nullish(),
+  labelIds: z.array(z.string()).default([])
 });
 
 type FormData = z.infer<typeof createTaskSchema>;
@@ -113,6 +115,19 @@ function Form({
             )}
           />
         </div>
+        <div className='grid gap-2'>
+          <Label htmlFor='labels'>Labels</Label>
+          <Controller
+            control={control}
+            name='labelIds'
+            render={({ field: { value, onChange } }) => (
+              <LabelSelector
+                selectedIds={value ?? []}
+                onChange={onChange}
+              />
+            )}
+          />
+        </div>
         {children}
       </div>
     </form>
@@ -153,7 +168,8 @@ export function CreateTaskForm() {
               body: JSON.stringify({
                 title: data.title.trim(),
                 description: data.description,
-                due: data.due
+                due: data.due,
+                labelIds: data.labelIds ?? []
               })
             });
 
@@ -229,7 +245,8 @@ export function EditTaskForm({
             body: JSON.stringify({
               title: data.title.trim(),
               description: data.description,
-              due: data.due
+              due: data.due,
+              labelIds: data.labelIds ?? []
             })
           });
 

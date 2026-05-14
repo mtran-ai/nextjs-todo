@@ -90,10 +90,12 @@ test.describe('Task list UI improvements', () => {
       timeout: 10000
     });
 
-    await expect(page.locator('[data-testid="task-progress"]')).toBeVisible();
-    await expect(page.locator('[data-testid="task-progress"]')).toContainText(
-      '0 of 1'
+    await expect(page.locator('[data-testid="todo-stats"]')).toBeVisible();
+    await expect(page.locator('[data-testid="stats-total"]')).toHaveText('1');
+    await expect(page.locator('[data-testid="stats-completed"]')).toHaveText(
+      '0'
     );
+    await expect(page.locator('[data-testid="stats-pending"]')).toHaveText('1');
   });
 
   test('done task has dimmed appearance and strikethrough title', async ({

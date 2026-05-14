@@ -25,12 +25,14 @@ export function TaskMenu({
   id,
   title,
   description,
-  due
+  due,
+  labels
 }: {
   id: string;
   title: string;
   description: string | null;
   due: Date | null;
+  labels: { id: string; name: string; color: string }[];
 }) {
   const params = useParams();
 
@@ -111,6 +113,7 @@ export function TaskMenu({
           title={title}
           description={description}
           due={due}
+          labelIds={labels.map((l) => l.id)}
         />
       )}
       {dialog === 'gh-link' && (

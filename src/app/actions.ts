@@ -114,6 +114,113 @@ export const createComment = action(
   }
 );
 
+const hexColor = z
+  .string()
+  .regex(/^#[0-9a-fA-F]{6}$/, { message: 'Color must be a hex like #aabbcc' });
+
+const createLabelSchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: 'Label name is required' })
+    .max(30, { message: 'Label name is too long (max: 30 symbols)' }),
+  color: hexColor
+});
+
+export const createLabel = action(
+  createLabelSchema,
+  async ({ name, color }, { userId }) => {
+    try {
+      if (!userId)
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
+
+      const label = await db.label.create({
+        data: {
+          name: name.trim(),
+          color,
+          userId
+        }
+      });
+
+      revalidatePath('/[username]', 'page');
+
+      return label;
+    } catch (e) {
+      console.log(e);
+
+      return {
+        failure: 'Error occurred while creating the label!'
+      };
+    }
+  }
+);
+
+const listLabelsSchema = z.object({});
+
+export const listLabels = action(listLabelsSchema, async (_, { userId }) => {
+  try {
+    if (!userId)
+      return {
+        failure: SESSION_EXPIRED_MESSAGE
+      };
+
+    const labels = await db.label.findMany({
+      where: { userId },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, color: true }
+    });
+
+    return { labels };
+  } catch (e) {
+    console.log(e);
+
+    return {
+      failure: 'Error occurred while listing labels!'
+    };
+  }
+});
+
+const deleteLabelSchema = z.object({
+  id: z.string()
+});
+
+export const deleteLabel = action(
+  deleteLabelSchema,
+  async ({ id }, { userId }) => {
+    try {
+      if (!userId)
+        return {
+          failure: SESSION_EXPIRED_MESSAGE
+        };
+
+      const owned = await db.label.findFirst({
+        where: { id, userId },
+        select: { id: true }
+      });
+
+      if (!owned) {
+        return { failure: 'Label not found' };
+      }
+
+      const label = await db.label.delete({
+        where: { id },
+        select: { id: true }
+      });
+
+      revalidatePath('/[username]', 'page');
+
+      return label;
+    } catch (e) {
+      console.log(e);
+
+      return {
+        failure: 'Error occurred while deleting the label!'
+      };
+    }
+  }
+);
+
 const linkRepoSchema = z.object({
   taskId: z.string(),
   link: z

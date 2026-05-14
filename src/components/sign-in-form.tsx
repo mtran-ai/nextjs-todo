@@ -39,32 +39,33 @@ export function SignInForm() {
   function onSubmit(data: FormData) {
     setLoading(true);
 
-    toast.promise(
-      signIn('credentials', {
-        username: data.username,
-        password: data.password,
-        redirect: false
-      }),
-      {
-        loading: 'Loading...',
-        success: (dt) => {
-          if (dt && dt.error) throw dt;
-
-          setLoading(false);
-
-          startTransition(() => {
-            router.push(`/${data.username}`);
-          });
-
-          return 'Successfully signed in';
-        },
-        error: (dt) => {
-          setLoading(false);
-
-          return dt.error;
-        }
+    const signInPromise = signIn('credentials', {
+      username: data.username,
+      password: data.password,
+      redirect: false
+    }).then((res) => {
+      if (!res || res.error) {
+        throw new Error(res?.error || 'Sign in failed');
       }
-    );
+    });
+
+    toast.promise(signInPromise, {
+      loading: 'Loading...',
+      success: () => {
+        setLoading(false);
+
+        startTransition(() => {
+          router.push(`/${data.username}`);
+        });
+
+        return 'Successfully signed in';
+      },
+      error: (err: Error) => {
+        setLoading(false);
+
+        return err.message;
+      }
+    });
   }
 
   return (
