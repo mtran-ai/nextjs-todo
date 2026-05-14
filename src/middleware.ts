@@ -1,13 +1,15 @@
-import NextAuth from 'next-auth';
+import { NextResponse, type NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-import { authConfig } from '~/lib/auth.config';
 import { PAGES } from '~/lib/constants';
 
-const { auth } = NextAuth(authConfig);
+export async function middleware(req: NextRequest) {
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET
+  });
 
-export default auth(async (req) => {
-  const session = req.auth;
-  const isAuth = !!session;
+  const isAuth = !!token;
 
   const isAuthPage =
     req.nextUrl.pathname === PAGES.ROOT ||
@@ -15,6 +17,6 @@ export default auth(async (req) => {
     req.nextUrl.pathname === PAGES.SIGN_UP;
 
   if (isAuth && isAuthPage) {
-    return Response.redirect(new URL(`/${session.user.username}`, req.url));
+    return NextResponse.redirect(new URL(`/${token.username}`, req.url));
   }
-});
+}

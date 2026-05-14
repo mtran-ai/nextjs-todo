@@ -29,13 +29,16 @@ import { Icons } from '~/components/icons';
 
 import { formatDate } from '~/lib/utils';
 
+const PRIORITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH'] as const;
+
 const createTaskSchema = z.object({
   title: z
     .string()
     .min(1, { message: 'Title is required' })
     .max(30, { message: 'The title is too long (max: 30 symbols)' }),
   description: z.string().nullish(),
-  due: z.date().nullish()
+  due: z.date().nullish(),
+  priority: z.enum(PRIORITY_OPTIONS).default('MEDIUM')
 });
 
 type FormData = z.infer<typeof createTaskSchema>;
@@ -72,6 +75,28 @@ function Form({
             className='max-h-80'
             id='description'
             {...register('description')}
+          />
+        </div>
+        <div className='grid gap-2'>
+          <Label htmlFor='priority'>Priority</Label>
+          <Controller
+            control={control}
+            name='priority'
+            render={({ field: { value, onChange } }) => (
+              <div id='priority' className='flex gap-2'>
+                {PRIORITY_OPTIONS.map((option) => (
+                  <Button
+                    key={option}
+                    type='button'
+                    variant={value === option ? 'default' : 'outline'}
+                    className='flex-1 capitalize'
+                    onClick={() => onChange(option)}
+                  >
+                    {option.toLowerCase()}
+                  </Button>
+                ))}
+              </div>
+            )}
           />
         </div>
         <div className='grid gap-2'>
@@ -143,7 +168,10 @@ export function CreateTaskForm() {
         </DialogHeader>
         <Form
           props={{
-            resolver: zodResolver(createTaskSchema)
+            resolver: zodResolver(createTaskSchema),
+            defaultValues: {
+              priority: 'MEDIUM'
+            }
           }}
           onSubmit={async (data) => {
             setLoading(true);
@@ -153,7 +181,8 @@ export function CreateTaskForm() {
               body: JSON.stringify({
                 title: data.title.trim(),
                 description: data.description,
-                due: data.due
+                due: data.due,
+                priority: data.priority
               })
             });
 
@@ -198,7 +227,8 @@ export function EditTaskForm({
   id,
   title,
   description,
-  due
+  due,
+  priority
 }: {
   id: string;
   setDialogOpen: Dispatch<SetStateAction<boolean>>;
@@ -218,7 +248,8 @@ export function EditTaskForm({
           defaultValues: {
             title,
             description,
-            due
+            due,
+            priority: priority ?? 'MEDIUM'
           }
         }}
         onSubmit={async (data) => {
@@ -229,7 +260,8 @@ export function EditTaskForm({
             body: JSON.stringify({
               title: data.title.trim(),
               description: data.description,
-              due: data.due
+              due: data.due,
+              priority: data.priority
             })
           });
 

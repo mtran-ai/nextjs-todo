@@ -7,7 +7,8 @@ import { db } from '~/lib/db';
 const createTaskSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  due: z.string().nullish()
+  due: z.string().nullish(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('MEDIUM')
 });
 
 export async function POST(request: NextRequest) {
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
         title: body.title,
         description: body.description,
         due: body.due,
+        priority: body.priority,
         authorId: session.user.id
       }
     });
