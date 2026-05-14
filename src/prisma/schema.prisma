@@ -25,7 +25,6 @@ model Task {
     title       String
     description String?   @db.Text
     due         DateTime?
-    priority    Priority  @default(MEDIUM)
     createdAt   DateTime  @default(now())
     authorId    String
 
@@ -36,12 +35,6 @@ model Task {
 
     @@index([authorId])
     @@map("tasks")
-}
-
-enum Priority {
-    LOW
-    MEDIUM
-    HIGH
 }
 
 model Repo {

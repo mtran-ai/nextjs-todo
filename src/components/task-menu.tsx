@@ -25,14 +25,12 @@ export function TaskMenu({
   id,
   title,
   description,
-  due,
-  priority
+  due
 }: {
   id: string;
   title: string;
   description: string | null;
   due: Date | null;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH';
 }) {
   const params = useParams();
 
@@ -113,7 +111,6 @@ export function TaskMenu({
           title={title}
           description={description}
           due={due}
-          priority={priority}
         />
       )}
       {dialog === 'gh-link' && (

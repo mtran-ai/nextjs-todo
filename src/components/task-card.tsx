@@ -11,7 +11,6 @@ type TaskCardProps = {
     title: string;
     description: string | null;
     due: Date | null;
-    priority: 'LOW' | 'MEDIUM' | 'HIGH';
     gh: { fullName: string } | null;
     _count: { comments: number };
   };
