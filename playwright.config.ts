@@ -17,7 +17,7 @@ export default defineConfig({
     screenshot: 'only-on-failure'
   },
   webServer: {
-    command: 'npx dotenvx run --env-file=.env.local -- npm run dev',
+    command: 'npx dotenvx run --env-file=.env.test -- npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
