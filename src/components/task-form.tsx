@@ -24,6 +24,13 @@ import {
   DialogTitle,
   DialogTrigger
 } from '~/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '~/components/ui/select';
 
 import { Icons } from '~/components/icons';
 
@@ -35,7 +42,8 @@ const createTaskSchema = z.object({
     .min(1, { message: 'Title is required' })
     .max(30, { message: 'The title is too long (max: 30 symbols)' }),
   description: z.string().nullish(),
-  due: z.date().nullish()
+  due: z.date().nullish(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).default('MEDIUM')
 });
 
 type FormData = z.infer<typeof createTaskSchema>;
@@ -72,6 +80,25 @@ function Form({
             className='max-h-80'
             id='description'
             {...register('description')}
+          />
+        </div>
+        <div className='grid gap-2'>
+          <Label htmlFor='priority'>Priority</Label>
+          <Controller
+            control={control}
+            name='priority'
+            render={({ field: { value, onChange } }) => (
+              <Select value={value} onValueChange={onChange}>
+                <SelectTrigger id='priority'>
+                  <SelectValue placeholder='Select priority' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='LOW'>Low</SelectItem>
+                  <SelectItem value='MEDIUM'>Medium</SelectItem>
+                  <SelectItem value='HIGH'>High</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           />
         </div>
         <div className='grid gap-2'>
@@ -153,7 +180,8 @@ export function CreateTaskForm() {
               body: JSON.stringify({
                 title: data.title.trim(),
                 description: data.description,
-                due: data.due
+                due: data.due,
+                priority: data.priority
               })
             });
 
@@ -198,7 +226,8 @@ export function EditTaskForm({
   id,
   title,
   description,
-  due
+  due,
+  priority
 }: {
   id: string;
   setDialogOpen: Dispatch<SetStateAction<boolean>>;
@@ -218,7 +247,8 @@ export function EditTaskForm({
           defaultValues: {
             title,
             description,
-            due
+            due,
+            priority
           }
         }}
         onSubmit={async (data) => {
@@ -229,7 +259,8 @@ export function EditTaskForm({
             body: JSON.stringify({
               title: data.title.trim(),
               description: data.description,
-              due: data.due
+              due: data.due,
+              priority: data.priority
             })
           });
 
