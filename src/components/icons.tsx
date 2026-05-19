@@ -13,6 +13,8 @@ import {
   MessageCircle,
   SendHorizontal,
   ChevronDown,
+  ChevronUp,
+  Check,
   Github,
   Link
 } from 'lucide-react';
@@ -32,6 +34,9 @@ export const Icons = {
   comments: MessageCircle,
   send: SendHorizontal,
   arrowDown: ChevronDown,
+  chevronDown: ChevronDown,
+  chevronUp: ChevronUp,
+  check: Check,
   github: Github,
   link: Link
 };

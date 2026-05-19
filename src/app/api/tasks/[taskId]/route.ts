@@ -11,7 +11,8 @@ const paramsSchema = z.object({
 const updateTaskSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  due: z.string().nullish()
+  due: z.string().nullish(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional()
 });
 
 export async function PATCH(
@@ -37,7 +38,8 @@ export async function PATCH(
       data: {
         title: body.title,
         description: body.description,
-        due: body.due
+        due: body.due,
+        priority: body.priority
       },
       where: {
         id: params.taskId
